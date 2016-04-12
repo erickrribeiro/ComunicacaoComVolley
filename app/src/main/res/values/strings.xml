@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">VolleySimples</string>
+    <string name="app_name">ExVolley</string>
     <string name="btn_json">Json Request</string>
-    <string name="btn_string">String Request</string>
-    <string name="btn_image">Image Request</string>
+    <string name="btn_string">Receber uma String</string>
+    <string name="btn_image">Receber uma Imagem</string>
 
-    <string name="btn_json_obj_request">Json Object Request</string>
-    <string name="btn_json_array_request">Json Array Request</string>
+    <string name="btn_json_obj_request">Receber um Json Object</string>
+    <string name="btn_json_array_request">Receber um Json Array</string>
 
 </resources>

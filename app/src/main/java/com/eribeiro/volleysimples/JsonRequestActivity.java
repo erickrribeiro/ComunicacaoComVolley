@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request.Method;
@@ -32,7 +34,7 @@ public class JsonRequestActivity extends Activity implements OnClickListener {
 	private TextView msgResponse;
 	private ProgressDialog pDialog;
 
-	// These tags will be used to cancel the requests
+	//These tags will be used to cancel the requests
 	private String tag_json_obj = "jobj_req", tag_json_arry = "jarray_req";
 
 	@Override
@@ -68,7 +70,7 @@ public class JsonRequestActivity extends Activity implements OnClickListener {
 	private void makeJsonObjReq() {
 		showProgressDialog();
 		JsonObjectRequest jsonObjReq = new JsonObjectRequest(Method.GET,
-				Dominio.URL_JSON_OBJECT_LOCAL, null,
+				Dominio.URL_PACE_JSON_ARRAY, null,
 				new Response.Listener<JSONObject>() {
 
 					@Override
@@ -88,7 +90,7 @@ public class JsonRequestActivity extends Activity implements OnClickListener {
 
 			/**
 			 * Passing some request headers
-			 * */
+// Cancelling request			 * */
 			@Override
 			public Map<String, String> getHeaders() throws AuthFailureError {
 				HashMap<String, String> headers = new HashMap<String, String>();
@@ -109,24 +111,73 @@ public class JsonRequestActivity extends Activity implements OnClickListener {
 		};
 
 		// Adding request to request queue
-		AppController.getInstance().addToRequestQueue(jsonObjReq,
-				tag_json_obj);
+		AppController.getInstance().addToRequestQueue(jsonObjReq,tag_json_obj);
+		//ApplicationController.getInstance().getRequestQueue().cancelAll(tag_json_obj);
 
-		// Cancelling request
-		// ApplicationController.getInstance().getRequestQueue().cancelAll(tag_json_obj);		
 	}
 
 	/**
 	 * Making json array request
 	 * */
+	String jsonResponse;
 	private void makeJsonArryReq() {
 		showProgressDialog();
-		JsonArrayRequest req = new JsonArrayRequest(Dominio.URL_JSON_OBJECT_LOCAL,
+		JsonArrayRequest req = new JsonArrayRequest(Dominio.URL_PACE_JSON_ARRAY,
 				new Response.Listener<JSONArray>() {
 					@Override
 					public void onResponse(JSONArray response) {
 						Log.d(TAG, response.toString());
-						msgResponse.setText(response.toString());
+
+						try {
+
+							jsonResponse = "";
+							/**
+							 * Loop contendo as postagens
+							 */
+							for (int i = 0; i < response.length(); i++) {
+
+								JSONObject feedItemJSONObject = (JSONObject) response.get(i);
+
+								String id = feedItemJSONObject.getString("id");
+								String date = feedItemJSONObject.getString("date_gmt");
+								String link = feedItemJSONObject.getString("link");
+
+								///----------
+
+								JSONObject titleJSONObject = feedItemJSONObject.getJSONObject("title");
+
+								String rendered = titleJSONObject.getString("rendered");
+
+								String authorID =feedItemJSONObject.getString("author");
+
+								///----------
+
+								JSONObject excerptJSONObject = feedItemJSONObject.getJSONObject("excerpt");
+
+								String excerpt = excerptJSONObject.getString("rendered");
+
+								///----------
+
+								String featured_media =feedItemJSONObject.getString("featured_media");
+
+								jsonResponse += "id: " + id + "\n\n";
+								jsonResponse += "Date: " + date + "\n\n";
+								jsonResponse += "Link: " + link + "\n\n";
+								jsonResponse += "Title: " + rendered + "\n\n\n";
+
+							}
+
+							msgResponse.setText(jsonResponse);
+
+						} catch (JSONException e) {
+							e.printStackTrace();
+							Toast.makeText(getApplicationContext(),"Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+						}
+
+
+
+
+						//msgResponse.setText(response.toString());
 						hideProgressDialog();
 					}
 				}, new Response.ErrorListener() {

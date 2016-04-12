@@ -16,35 +16,25 @@ import com.android.volley.toolbox.StringRequest;
 import com.eribeiro.volleysimples.app.AppController;
 import com.eribeiro.volleysimples.utils.Dominio;
 
-public class StringRequestActivity extends Activity {
+public class StringRequestActivity extends Activity implements View.OnClickListener{
 
 	private String TAG = StringRequestActivity.class.getSimpleName();
-	private Button btnStringReq;
-	private TextView msgResponse;
+	private TextView mTextViewResponse;
 	private ProgressDialog pDialog;
-
-	// This tag will be used to cancel the request
-	private String tag_string_req = "string_req";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_string);
 
-		btnStringReq = (Button) findViewById(R.id.btnStringReq);
-		msgResponse = (TextView) findViewById(R.id.msgResponse);
+		Button btnStringReq = (Button) findViewById(R.id.btnStringReq);
+		mTextViewResponse = (TextView) findViewById(R.id.msgResponse);
 
-		pDialog = new ProgressDialog(this);
-		pDialog.setMessage("Loading...");
+		pDialog = new ProgressDialog(getApplicationContext());
+		pDialog.setMessage("Carregando...");
 		pDialog.setCancelable(false);
 
-		btnStringReq.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				makeStringReq();
-			}
-		});
+		btnStringReq.setOnClickListener(this);
 	}
 
 	private void showProgressDialog() {
@@ -68,8 +58,8 @@ public class StringRequestActivity extends Activity {
 
 					@Override
 					public void onResponse(String response) {
-						Log.d(TAG, response.toString());
-						msgResponse.setText(response.toString());
+						Log.d(TAG, response);
+						mTextViewResponse.setText(response);
 						hideProgressDialog();
 
 					}
@@ -82,8 +72,16 @@ public class StringRequestActivity extends Activity {
 					}
 				});
 
-		// Adding request to request queue
-		AppController.getInstance().addToRequestQueue(strReq, tag_string_req);
+		/**
+		 * Adiciona um requisição a fila de requisições, nomeando esse requisição por "string_req"
+ 		 */
 
+		AppController.getInstance().addToRequestQueue(strReq, "string_req");
+
+	}
+
+	@Override
+	public void onClick(View v) {
+		makeStringReq();
 	}
 }
